@@ -1,141 +1,109 @@
-/* ResumeIQ App Styles */
+/* ═══════════════════════════════════════════
+   ResumeIQ — Global Design Tokens & Reset
+   Dark Obsidian / Glassmorphism Theme
+═══════════════════════════════════════════ */
 
-* {
+:root {
+  /* ── Color Palette ── */
+  --bg-base:        #0a0812;
+  --bg-grad-start:  #0f0c20;
+  --bg-grad-mid:    #15102a;
+  --bg-grad-end:    #06040a;
+
+  --glass-bg:       rgba(255, 255, 255, 0.04);
+  --glass-bg-hover: rgba(255, 255, 255, 0.07);
+  --glass-border:   rgba(255, 255, 255, 0.08);
+  --glass-border-focus: rgba(138, 92, 246, 0.6);
+
+  --input-bg:       rgba(15, 12, 32, 0.65);
+  --input-border:   rgba(255, 255, 255, 0.07);
+
+  /* ── Text ── */
+  --text-primary:   #f1f0ff;
+  --text-secondary: #a29bfe;
+  --text-muted:     #6b6a8a;
+  --text-heading:   #ffffff;
+
+  /* ── Brand Accents ── */
+  --violet:         #8a5cf6;
+  --indigo:         #4f46e5;
+  --fuchsia:        #d946ef;
+  --pink:           #ec4899;
+
+  /* ── Semantic Colors ── */
+  --green:          #10b981;
+  --green-dim:      rgba(16, 185, 129, 0.12);
+  --green-border:   rgba(16, 185, 129, 0.35);
+
+  --amber:          #f59e0b;
+  --amber-dim:      rgba(245, 158, 11, 0.12);
+  --amber-border:   rgba(245, 158, 11, 0.35);
+
+  --red:            #ef4444;
+  --red-dim:        rgba(239, 68, 68, 0.12);
+  --red-border:     rgba(239, 68, 68, 0.35);
+
+  --purple-dim:     rgba(138, 92, 246, 0.12);
+  --purple-border:  rgba(138, 92, 246, 0.35);
+
+  /* ── Shadows & Glows ── */
+  --shadow-card:    0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  --glow-violet:    0 0 40px rgba(138, 92, 246, 0.18);
+  --glow-cta:       0 8px 32px rgba(138, 92, 246, 0.45);
+
+  /* ── Typography ── */
+  --font-display:   'Syne', sans-serif;
+  --font-body:      'DM Sans', sans-serif;
+
+  /* ── Spacing Scale ── */
+  --r-sm:  6px;
+  --r-md:  10px;
+  --r-lg:  14px;
+  --r-xl:  20px;
+  --r-2xl: 28px;
+
+  /* ── Transitions ── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-base);
+  min-height: 100svh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-/* Animations */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
+#root {
+  width: 100%;
+  min-height: 100svh;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(138, 92, 246, 0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(138, 92, 246, 0.5); }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: 500px;
-  }
+/* ── Selection ── */
+::selection {
+  background: rgba(138, 92, 246, 0.35);
+  color: #fff;
 }
-
-.pulsing-dot {
-  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  display: inline-block;
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Results Container */
-.results-container {
-  animation: slideDown 0.4s ease-out;
-}
-
-/* Score Circle - Red */
-.score-red {
-  border-color: #ef4444;
-  color: #ef4444;
-}
-
-/* Score Circle - Yellow */
-.score-yellow {
-  border-color: #f59e0b;
-  color: #f59e0b;
-}
-
-/* Score Circle - Green */
-.score-green {
-  border-color: #10b981;
-  color: #10b981;
-}
-
-/* Keyword Chips */
-.chip-missing {
-  background-color: #fee2e2;
-  color: #991b1b;
-}
-
-.chip-match {
-  background-color: #dcfce7;
-  color: #166534;
-}
-
-.chip-company {
-  background-color: #f3e8ff;
-  color: #6b21a8;
-}
-
-/* Buttons */
-button {
-  transition: all 0.3s ease;
-}
-
-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* Input Elements */
-input[type="file"],
-textarea {
-  transition: border-color 0.3s;
-}
-
-input[type="file"]:focus,
-textarea:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  body {
-    padding: 20px;
-  }
-  
-  h1 {
-    font-size: 28px;
-  }
-  
-  h2 {
-    font-size: 20px;
-  }
-  
-  h3 {
-    font-size: 16px;
-  }
-}
-
