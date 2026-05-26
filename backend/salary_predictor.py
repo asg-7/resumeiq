@@ -1,42 +1,48 @@
-import csv
 import os
 import json
+import re
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
+from salary_scraper import scrape_salary_data
 
 load_dotenv()
 
-def load_salary_context() -> str:
-    rows = []
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_path = os.path.join(base_dir, 'salary_data.csv')
-    with open(csv_path, encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for row in list(reader)[:120]:  # Load up to 120 rows to give a slightly richer context
-            rows.append(f"{row.get('role','')}, {row.get('experience','')} yrs, {row.get('salary','')} LPA")
-    return '\n'.join(rows)
+def extract_role_from_resume(resume_text: str, llm) -> str:
+    """Quickly extract the primary job role from the resume to use for scraping."""
+    prompt = f"Resume:\\n{resume_text[:2000]}\\n\\nWhat is the primary job role or title of this candidate? Respond with ONLY the job title (e.g., 'Software Engineer', 'Data Analyst')."
+    try:
+        response = llm.invoke(prompt)
+        return response.content.strip()
+    except:
+        return "Software Engineer" # Fallback
 
 def predict_salary(resume_text: str) -> dict:
-    context = load_salary_context()
     llm = ChatGoogleGenerativeAI(
         model='gemini-1.5-flash',
         google_api_key=os.getenv('GEMINI_API_KEY')
     )
+    
+    # Step 1: Extract the role
+    role = extract_role_from_resume(resume_text, llm)
+    
+    # Step 2: Scrape live market data for this role
+    market_context = scrape_salary_data(role)
+    
+    # Step 3: Predict salary
     prompt = f'''Resume:
 {resume_text[:2000]}
 
-Market Data:
-{context}
+Scraped Market Data Context for {role}:
+{market_context}
 
-Based on the resume content and matching experience levels, predict a realistic Indian IT salary range in LPA (Lakhs Per Annum) for the candidate. Use the market data for context where relevant.
+Based on the resume content, the extracted role "{role}", and matching experience levels, predict a realistic Indian IT salary range in LPA (Lakhs Per Annum) for the candidate. Use the market data for context where relevant, or rely on your extensive pre-trained knowledge of the Indian market.
 
 Respond ONLY with valid JSON. Do not include markdown code block backticks (like ```json).
-{{"extracted_role":"","years_of_experience":0,"college_tier":"","tech_stack":[],"min_salary_lpa":0,"max_salary_lpa":0,"median_salary_lpa":0,"confidence":"","reasoning":"","negotiation_tip":""}}'''
+{{"extracted_role":"{role}","years_of_experience":0,"college_tier":"","tech_stack":[],"min_salary_lpa":0,"max_salary_lpa":0,"median_salary_lpa":0,"confidence":"","reasoning":"","negotiation_tip":""}}'''
     
     response = llm.invoke(prompt)
     content = response.content.strip()
     
-    # Strip markdown formatting if the model still includes it
     if content.startswith("```"):
         lines = content.splitlines()
         if lines[0].startswith("```"):
@@ -48,10 +54,7 @@ Respond ONLY with valid JSON. Do not include markdown code block backticks (like
     try:
         return json.loads(content)
     except Exception as e:
-        # Fallback in case JSON parsing fails
         print(f"JSON parsing error: {e}. Raw content: {content}")
-        # Let's try to extract JSON using a regex or simple substring or return a default dict
-        import re
         match = re.search(r'\{.*\}', content, re.DOTALL)
         if match:
             try:
