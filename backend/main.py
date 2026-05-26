@@ -68,3 +68,23 @@ def salary(req: SalaryRequest):
         return predict_salary(req.resume_text)
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+
+class CompareRequest(BaseModel):
+    resume_text: str
+    job_description_1: str
+    job_description_2: str
+
+
+@app.post("/compare-jd")
+def compare_jd(req: CompareRequest):
+    """Compare resume fit against two job descriptions side-by-side."""
+    try:
+        result1 = analyze_resume(req.resume_text, req.job_description_1)
+        result2 = analyze_resume(req.resume_text, req.job_description_2)
+        return {
+            "status": "success",
+            "data": {"jd1": result1, "jd2": result2}
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
